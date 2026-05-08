@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "fr.mimifan.mimistweaks.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "mimistweaks.refmap.json",
+  "mixins": [],
+  "client": [
+    "MixinBlockStateBase",
+    "MixinBlockBehaviour",
+    "MixinLightTexture"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
+
