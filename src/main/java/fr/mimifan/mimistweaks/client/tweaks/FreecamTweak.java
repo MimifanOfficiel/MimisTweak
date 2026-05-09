@@ -3,6 +3,7 @@ package fr.mimifan.mimistweaks.client.tweaks;
 import fr.mimifan.mimistweaks.client.TweaksClient;
 import fr.mimifan.mimistweaks.utils.TweaksClientSettings;
 import net.minecraft.client.CameraType;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
@@ -11,6 +12,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.UUID;
 
 public final class FreecamTweak implements ClientTweak {
 
@@ -25,6 +28,8 @@ public final class FreecamTweak implements ClientTweak {
     private float savedYRot, savedXRot;
 
     private float yaw, pitch;
+
+    private UUID ownerPlayerId;
 
     private FreecamEntity camera;
 
@@ -41,12 +46,42 @@ public final class FreecamTweak implements ClientTweak {
     @Override
     public void setEnabled(boolean enabled, LocalPlayer player, Minecraft mc) {
         if (enabled) start(player, mc);
-        else stop(player, mc, "message.mimistweaks.freecam.disabled");
+        else {
+            if (canRestorePlayerState(player)) {
+                stop(player, mc, "message.mimistweaks.freecam.disabled");
+            } else {
+                hardReset(mc, player);
+            }
+        }
+    }
+
+    public void onClientLifecycleTick(Minecraft mc) {
+        if (!enabled) {
+            return;
+        }
+
+        LocalPlayer player = mc.player;
+        if (player == null || mc.level == null || camera == null) {
+            hardReset(mc, player);
+            return;
+        }
+
+        if (!canRestorePlayerState(player)) {
+            hardReset(mc, player);
+        }
     }
 
     @Override
     public void onClientTick(Minecraft mc, LocalPlayer player) {
         if (!enabled || camera == null) return;
+
+        if (!canRestorePlayerState(player)) {
+            hardReset(mc, player);
+            return;
+        }
+
+        // Never send attack interactions while freecam is active.
+        KeyMapping.set(mc.options.keyAttack.getKey(), false);
 
         if (TweaksClient.shouldStopForUnfocusedWindow(mc, TweaksClientSettings.isFreecamAllowWhenUnfocused())) {
             stop(player, mc, "message.mimistweaks.freecam.stopped_unfocused");
@@ -59,6 +94,12 @@ public final class FreecamTweak implements ClientTweak {
         }
 
         // Convert mouse look into freecam rotation, then lock player view back in place.
+        double prevCamX = camera.getX();
+        double prevCamY = camera.getY();
+        double prevCamZ = camera.getZ();
+        float prevYaw = yaw;
+        float prevPitch = pitch;
+
         float deltaYaw = Mth.wrapDegrees(player.getYRot() - savedYRot);
         float deltaPitch = player.getXRot() - savedXRot;
         yaw = Mth.wrapDegrees(yaw + deltaYaw);
@@ -106,13 +147,13 @@ public final class FreecamTweak implements ClientTweak {
         double nz = camera.getZ() + mz;
 
         camera.setPos(nx, ny, nz);
-        camera.xo = nx;
-        camera.yo = ny;
-        camera.zo = nz;
+        camera.xo = prevCamX;
+        camera.yo = prevCamY;
+        camera.zo = prevCamZ;
         camera.setYRot(yaw);
         camera.setXRot(pitch);
-        camera.yRotO = yaw;
-        camera.xRotO = pitch;
+        camera.yRotO = prevYaw;
+        camera.xRotO = prevPitch;
         camera.setYHeadRot(yaw);
         camera.setYBodyRot(yaw);
 
@@ -137,6 +178,7 @@ public final class FreecamTweak implements ClientTweak {
         }
 
         enabled = true;
+        ownerPlayerId = player.getUUID();
 
         prevMayfly = player.getAbilities().mayfly;
         prevFlying = player.getAbilities().flying;
@@ -162,6 +204,9 @@ public final class FreecamTweak implements ClientTweak {
         camera.setXRot(pitch);
         camera.yRotO = yaw;
         camera.xRotO = pitch;
+        camera.xo = camera.getX();
+        camera.yo = camera.getY();
+        camera.zo = camera.getZ();
 
         mc.setCameraEntity(camera);
         mc.options.setCameraType(CameraType.FIRST_PERSON);
@@ -184,8 +229,28 @@ public final class FreecamTweak implements ClientTweak {
         mc.setCameraEntity(prevCameraEntity == null ? player : prevCameraEntity);
         camera = null;
         prevCameraEntity = null;
+        ownerPlayerId = null;
 
         player.displayClientMessage(Component.translatable(key), true);
+    }
+
+    private boolean canRestorePlayerState(LocalPlayer player) {
+        if (player == null || ownerPlayerId == null || camera == null) {
+            return false;
+        }
+        return ownerPlayerId.equals(player.getUUID()) && camera.level() == player.level();
+    }
+
+    private void hardReset(Minecraft mc, LocalPlayer player) {
+        enabled = false;
+
+        if (player != null && mc.getCameraEntity() == camera) {
+            mc.setCameraEntity(player);
+        }
+
+        camera = null;
+        prevCameraEntity = null;
+        ownerPlayerId = null;
     }
 
     // =========================

@@ -129,6 +129,7 @@ public final class TweaksClient {
 
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
+        FREECAM.onClientLifecycleTick(mc);
         if (player == null || mc.gameMode == null) {
             return;
         }
