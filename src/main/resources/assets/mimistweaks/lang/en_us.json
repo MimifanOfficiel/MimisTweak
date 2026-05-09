@@ -1,7 +1,6 @@
 {
-  "itemGroup.mimistweaks": "Example Mod Tab",
-  "block.mimistweaks.example_block": "Example Block",
-  "item.mimistweaks.example_item": "Example Item",
+  "key.categories.mimistweaks": "MimisTweaks",
+  "key.mimistweaks.config": "Open Config Menu",
 
   "key.categories.mimistweaks.autofishing": "AutoFishing",
   "key.mimistweaks.autofishing.toggle": "Start/Stop AutoFishing",

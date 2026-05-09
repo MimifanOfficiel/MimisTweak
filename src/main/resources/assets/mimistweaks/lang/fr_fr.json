@@ -1,4 +1,7 @@
 {
+  "key.categories.mimistweaks": "MimisTweaks",
+  "key.mimistweaks.config": "Ouvrir le menu de config",
+
   "key.categories.mimistweaks.autofishing": "AutoFishing",
   "key.mimistweaks.autofishing.toggle": "Demarrer/Arreter AutoFishing",
   "key.mimistweaks.autofishing.config": "Ouvrir la config auto",

@@ -56,6 +56,7 @@ public final class TweaksClient {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         ConfigPersistence.load();
+        TweaksClientSettings.setConfigKeyCode(MimisKeybinds.getConfigKeyCode());
         TARGET_INFO_TWEAK.syncEnabledFromSettings();
         if (!listenersRegistered) {
             NeoForge.EVENT_BUS.addListener(TweaksClient::onClientTick);
@@ -131,6 +132,8 @@ public final class TweaksClient {
         if (player == null || mc.gameMode == null) {
             return;
         }
+        // Keep only the config-menu key synced with Minecraft Controls.
+        TweaksClientSettings.setConfigKeyCode(MimisKeybinds.getConfigKeyCode());
         if (mc.screen != null) {
             // Ignore all hotkeys while a GUI is open (chat, inventory, menus, config screens, ...).
             syncTrackedKeyStateToCurrent();
