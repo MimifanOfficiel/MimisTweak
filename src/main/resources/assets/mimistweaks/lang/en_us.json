@@ -6,6 +6,7 @@
   "key.mimistweaks.autofishing.toggle": "Start/Stop AutoFishing",
   "key.mimistweaks.autofishing.config": "Open Auto Settings",
   "key.mimistweaks.autoclick.toggle": "Start/Stop AutoClick",
+  "key.mimistweaks.autotool.toggle": "Start/Stop AutoTool",
   "key.mimistweaks.freecam.toggle": "Toggle Freecam",
   "key.mimistweaks.zoom.toggle": "Toggle Zoom",
   "key.mimistweaks.fullbright.toggle": "Toggle Fullbright",
@@ -21,6 +22,9 @@
   "message.mimistweaks.autoclick.disabled": "AutoClick: OFF",
   "message.mimistweaks.autoclick.stopped_gui": "AutoClick: stopped (GUI opened).",
   "message.mimistweaks.autoclick.stopped_unfocused": "AutoClick: stopped (window unfocused).",
+
+  "message.mimistweaks.autotool.enabled": "AutoTool: ON",
+  "message.mimistweaks.autotool.disabled": "AutoTool: OFF",
 
   "message.mimistweaks.freecam.enabled": "Freecam: ON",
   "message.mimistweaks.freecam.disabled": "Freecam: OFF",
@@ -46,6 +50,7 @@
 
   "screen.mimistweaks.tweak.autofishing": "AutoFishing",
   "screen.mimistweaks.tweak.autoclick": "AutoClick",
+  "screen.mimistweaks.tweak.autotool": "AutoTool",
   "screen.mimistweaks.tweak.freecam": "Freecam",
   "screen.mimistweaks.tweak.zoom": "Zoom",
   "screen.mimistweaks.tweak.fullbright": "Fullbright",
@@ -70,6 +75,9 @@
   "screen.mimistweaks.autoclick.button.right": "Right click",
   "screen.mimistweaks.autoclick.stop_on_screens": "Stop on opened screens",
   "screen.mimistweaks.autoclick.allow_unfocused": "Allow when unfocused",
+
+  "screen.mimistweaks.autotool.stop_on_screens": "Stop on opened screens",
+  "screen.mimistweaks.autotool.allow_unfocused": "Allow when unfocused",
 
   "screen.mimistweaks.freecam.stop_on_screens": "Stop on opened screens",
   "screen.mimistweaks.freecam.allow_unfocused": "Allow when unfocused",

@@ -29,6 +29,8 @@ public final class TweaksClientSettings {
     private static boolean fishingAllowWhenUnfocused = true;
     private static boolean autoClickStopOnOpenedScreen = false;
     private static boolean autoClickAllowWhenUnfocused = true;
+    private static boolean autoToolStopOnOpenedScreen = false;
+    private static boolean autoToolAllowWhenUnfocused = true;
     private static boolean freecamStopOnOpenedScreen = false;
     private static boolean freecamAllowWhenUnfocused = true;
     private static boolean zoomStopOnOpenedScreen = false;
@@ -37,6 +39,7 @@ public final class TweaksClientSettings {
     // Per-tweak key codes (GLFW values, or encoded mouse buttons)
     private static int fishingKeyCode    = 79;  // GLFW_KEY_O
     private static int autoClickKeyCode  = 75;  // GLFW_KEY_K
+    private static int autoToolKeyCode   = KEY_UNBOUND;
     private static int configKeyCode     = 80;  // GLFW_KEY_P
     private static int freecamKeyCode    = KEY_UNBOUND;
     private static int zoomKeyCode       = KEY_UNBOUND;
@@ -211,6 +214,22 @@ public final class TweaksClientSettings {
         autoClickAllowWhenUnfocused = value;
     }
 
+    public static boolean isAutoToolStopOnOpenedScreen() {
+        return autoToolStopOnOpenedScreen;
+    }
+
+    public static void setAutoToolStopOnOpenedScreen(boolean value) {
+        autoToolStopOnOpenedScreen = value;
+    }
+
+    public static boolean isAutoToolAllowWhenUnfocused() {
+        return autoToolAllowWhenUnfocused;
+    }
+
+    public static void setAutoToolAllowWhenUnfocused(boolean value) {
+        autoToolAllowWhenUnfocused = value;
+    }
+
     public static boolean isFreecamStopOnOpenedScreen() {
         return freecamStopOnOpenedScreen;
     }
@@ -263,6 +282,8 @@ public final class TweaksClientSettings {
     public static void setFishingKeyCode(int v)   { fishingKeyCode = sanitizeKeyCode(v); }
     public static int getAutoClickKeyCode()       { return autoClickKeyCode; }
     public static void setAutoClickKeyCode(int v) { autoClickKeyCode = sanitizeKeyCode(v); }
+    public static int getAutoToolKeyCode()        { return autoToolKeyCode; }
+    public static void setAutoToolKeyCode(int v)  { autoToolKeyCode = sanitizeKeyCode(v); }
     public static int getConfigKeyCode()          { return configKeyCode; }
     public static void setConfigKeyCode(int v)    { configKeyCode = sanitizeKeyCode(v); }
     public static int getFreecamKeyCode()         { return freecamKeyCode; }

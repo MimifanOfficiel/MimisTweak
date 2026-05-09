@@ -60,6 +60,7 @@ public class TweaksConfigScreen extends Screen {
             return switch (tweak) {
                 case AUTO_FISHING    -> TweaksClientSettings.getFishingKeyCode();
                 case AUTO_CLICK      -> TweaksClientSettings.getAutoClickKeyCode();
+                case AUTO_TOOL       -> TweaksClientSettings.getAutoToolKeyCode();
                 case FREECAM         -> TweaksClientSettings.getFreecamKeyCode();
                 case ZOOM            -> TweaksClientSettings.getZoomKeyCode();
                 case FULLBRIGHT      -> TweaksClientSettings.getFullbrightKeyCode();
@@ -74,6 +75,7 @@ public class TweaksConfigScreen extends Screen {
             switch (tweak) {
                 case AUTO_FISHING    -> TweaksClientSettings.setFishingKeyCode(code);
                 case AUTO_CLICK      -> TweaksClientSettings.setAutoClickKeyCode(code);
+                case AUTO_TOOL       -> TweaksClientSettings.setAutoToolKeyCode(code);
                 case FREECAM         -> TweaksClientSettings.setFreecamKeyCode(code);
                 case ZOOM            -> TweaksClientSettings.setZoomKeyCode(code);
                 case FULLBRIGHT      -> TweaksClientSettings.setFullbrightKeyCode(code);
@@ -239,6 +241,10 @@ public class TweaksConfigScreen extends Screen {
                                 applyPendingValues();
                             })));
             panel.tweaks.add(autoClick);
+
+            TweakEntry autoTool = new TweakEntry(TweaksClient.Tweak.AUTO_TOOL, "screen.mimistweaks.tweak.autotool");
+            autoTool.expanded = TweaksClientSettings.getTweakExpanded(TweaksClient.Tweak.AUTO_TOOL);
+            panel.tweaks.add(autoTool);
         } else if (category == Category.MISC) {
             TweakEntry freecam = new TweakEntry(TweaksClient.Tweak.FREECAM, "screen.mimistweaks.tweak.freecam");
             freecam.expanded = TweaksClientSettings.getTweakExpanded(TweaksClient.Tweak.FREECAM);

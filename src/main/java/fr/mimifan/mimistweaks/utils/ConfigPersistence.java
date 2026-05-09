@@ -61,6 +61,7 @@ public final class ConfigPersistence {
         // Key codes
         obj.addProperty("fishingKeyCode",   TweaksClientSettings.getFishingKeyCode());
         obj.addProperty("autoClickKeyCode", TweaksClientSettings.getAutoClickKeyCode());
+        obj.addProperty("autoToolKeyCode",  TweaksClientSettings.getAutoToolKeyCode());
         obj.addProperty("configKeyCode",    TweaksClientSettings.getConfigKeyCode());
         obj.addProperty("freecamKeyCode",   TweaksClientSettings.getFreecamKeyCode());
         obj.addProperty("zoomKeyCode",      TweaksClientSettings.getZoomKeyCode());
@@ -111,6 +112,8 @@ public final class ConfigPersistence {
             if (obj.has("autoClickRightClick"))          TweaksClientSettings.setAutoClickRightClick(obj.get("autoClickRightClick").getAsBoolean());
             if (obj.has("autoClickStopOnOpenedScreen")) TweaksClientSettings.setAutoClickStopOnOpenedScreen(obj.get("autoClickStopOnOpenedScreen").getAsBoolean());
             if (obj.has("autoClickAllowWhenUnfocused")) TweaksClientSettings.setAutoClickAllowWhenUnfocused(obj.get("autoClickAllowWhenUnfocused").getAsBoolean());
+            if (obj.has("autoToolStopOnOpenedScreen"))  TweaksClientSettings.setAutoToolStopOnOpenedScreen(obj.get("autoToolStopOnOpenedScreen").getAsBoolean());
+            if (obj.has("autoToolAllowWhenUnfocused"))  TweaksClientSettings.setAutoToolAllowWhenUnfocused(obj.get("autoToolAllowWhenUnfocused").getAsBoolean());
             if (obj.has("freecamStopOnOpenedScreen"))   TweaksClientSettings.setFreecamStopOnOpenedScreen(obj.get("freecamStopOnOpenedScreen").getAsBoolean());
             if (obj.has("freecamAllowWhenUnfocused"))   TweaksClientSettings.setFreecamAllowWhenUnfocused(obj.get("freecamAllowWhenUnfocused").getAsBoolean());
             if (obj.has("zoomPercent"))                 TweaksClientSettings.setZoomPercent(obj.get("zoomPercent").getAsInt());
@@ -130,6 +133,7 @@ public final class ConfigPersistence {
             if (obj.has("targetInfoShowPlayerEquipment")) TweaksClientSettings.setTargetInfoShowPlayerEquipment(obj.get("targetInfoShowPlayerEquipment").getAsBoolean());
             if (obj.has("fishingKeyCode"))   TweaksClientSettings.setFishingKeyCode(obj.get("fishingKeyCode").getAsInt());
             if (obj.has("autoClickKeyCode")) TweaksClientSettings.setAutoClickKeyCode(obj.get("autoClickKeyCode").getAsInt());
+            if (obj.has("autoToolKeyCode"))  TweaksClientSettings.setAutoToolKeyCode(obj.get("autoToolKeyCode").getAsInt());
             if (obj.has("configKeyCode"))    TweaksClientSettings.setConfigKeyCode(obj.get("configKeyCode").getAsInt());
             if (obj.has("freecamKeyCode"))   TweaksClientSettings.setFreecamKeyCode(obj.get("freecamKeyCode").getAsInt());
             if (obj.has("zoomKeyCode"))      TweaksClientSettings.setZoomKeyCode(obj.get("zoomKeyCode").getAsInt());

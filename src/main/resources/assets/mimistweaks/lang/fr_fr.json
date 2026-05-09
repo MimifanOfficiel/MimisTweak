@@ -6,6 +6,7 @@
   "key.mimistweaks.autofishing.toggle": "Demarrer/Arreter AutoFishing",
   "key.mimistweaks.autofishing.config": "Ouvrir la config auto",
   "key.mimistweaks.autoclick.toggle": "Demarrer/Arreter AutoClick",
+  "key.mimistweaks.autotool.toggle": "Demarrer/Arreter AutoTool",
   "key.mimistweaks.freecam.toggle": "Activer/Desactiver Freecam",
   "key.mimistweaks.zoom.toggle": "Activer/Desactiver Zoom",
   "key.mimistweaks.fullbright.toggle": "Activer/Desactiver Fullbright",
@@ -21,6 +22,9 @@
   "message.mimistweaks.autoclick.disabled": "AutoClick: DESACTIVE",
   "message.mimistweaks.autoclick.stopped_gui": "AutoClick: arrete (GUI ouvert).",
   "message.mimistweaks.autoclick.stopped_unfocused": "AutoClick: arrete (fenetre non active).",
+
+  "message.mimistweaks.autotool.enabled": "AutoTool: ACTIVE",
+  "message.mimistweaks.autotool.disabled": "AutoTool: DESACTIVE",
 
   "message.mimistweaks.freecam.enabled": "Freecam: ACTIVE",
   "message.mimistweaks.freecam.disabled": "Freecam: DESACTIVE",
@@ -46,6 +50,7 @@
 
   "screen.mimistweaks.tweak.autofishing": "AutoFishing",
   "screen.mimistweaks.tweak.autoclick": "AutoClick",
+  "screen.mimistweaks.tweak.autotool": "AutoTool",
   "screen.mimistweaks.tweak.freecam": "Freecam",
   "screen.mimistweaks.tweak.zoom": "Zoom",
   "screen.mimistweaks.tweak.fullbright": "Fullbright",
@@ -70,6 +75,9 @@
   "screen.mimistweaks.autoclick.button.right": "Clic droit",
   "screen.mimistweaks.autoclick.stop_on_screens": "Stop si GUI ouvert",
   "screen.mimistweaks.autoclick.allow_unfocused": "Continuer sans le focus",
+
+  "screen.mimistweaks.autotool.stop_on_screens": "Stop si GUI ouvert",
+  "screen.mimistweaks.autotool.allow_unfocused": "Continuer sans le focus",
 
   "screen.mimistweaks.freecam.stop_on_screens": "Stop si GUI ouvert",
   "screen.mimistweaks.freecam.allow_unfocused": "Continuer sans le focus",

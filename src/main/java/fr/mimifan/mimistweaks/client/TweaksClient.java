@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import fr.mimifan.mimistweaks.MimisTweaks;
 import fr.mimifan.mimistweaks.client.tweaks.AutoClickTweak;
 import fr.mimifan.mimistweaks.client.tweaks.AutoFishingTweak;
+import fr.mimifan.mimistweaks.client.tweaks.AutoToolTweak;
 import fr.mimifan.mimistweaks.client.tweaks.FullbrightTweak;
 import fr.mimifan.mimistweaks.client.tweaks.FreecamTweak;
 import fr.mimifan.mimistweaks.client.tweaks.InventorySortTweak;
@@ -38,10 +39,11 @@ import java.util.Set;
 @EventBusSubscriber(modid = MimisTweaks.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public final class TweaksClient {
 
-    public enum Tweak { AUTO_FISHING, AUTO_CLICK, FREECAM, ZOOM, FULLBRIGHT, SORT_INVENTORY, MOUSE_TWEAKS, XRAY, TARGET_INFO }
+    public enum Tweak { AUTO_FISHING, AUTO_CLICK, AUTO_TOOL, FREECAM, ZOOM, FULLBRIGHT, SORT_INVENTORY, MOUSE_TWEAKS, XRAY, TARGET_INFO }
 
     private static final AutoFishingTweak AUTO_FISHING = new AutoFishingTweak();
     private static final AutoClickTweak AUTO_CLICK = new AutoClickTweak();
+    private static final AutoToolTweak AUTO_TOOL = new AutoToolTweak();
     private static final FreecamTweak FREECAM = new FreecamTweak();
     private static final ZoomTweak ZOOM = new ZoomTweak();
     private static final FullbrightTweak FULLBRIGHT = new FullbrightTweak();
@@ -73,6 +75,7 @@ public final class TweaksClient {
         return switch (tweak) {
             case AUTO_FISHING    -> AUTO_FISHING.isEnabled();
             case AUTO_CLICK      -> AUTO_CLICK.isEnabled();
+            case AUTO_TOOL       -> AUTO_TOOL.isEnabled();
             case FREECAM         -> FREECAM.isEnabled();
             case ZOOM            -> ZOOM.isEnabled();
             case FULLBRIGHT      -> FULLBRIGHT.isEnabled();
@@ -93,6 +96,7 @@ public final class TweaksClient {
         switch (tweak) {
             case AUTO_FISHING   -> AUTO_FISHING.setEnabled(enabled, player, mc);
             case AUTO_CLICK     -> AUTO_CLICK.setEnabled(enabled, player, mc);
+            case AUTO_TOOL      -> AUTO_TOOL.setEnabled(enabled, player, mc);
             case FREECAM        -> FREECAM.setEnabled(enabled, player, mc);
             case ZOOM           -> { /* hold-only */ }
             case FULLBRIGHT     -> FULLBRIGHT.setEnabled(enabled, player, mc);
@@ -174,6 +178,10 @@ public final class TweaksClient {
                 AUTO_CLICK.setEnabled(!AUTO_CLICK.isEnabled(), player, mc);
             }
 
+            if (consumeKeyPress(TweaksClientSettings.getAutoToolKeyCode())) {
+                AUTO_TOOL.setEnabled(!AUTO_TOOL.isEnabled(), player, mc);
+            }
+
             if (consumeKeyPress(TweaksClientSettings.getFreecamKeyCode())) {
                 FREECAM.setEnabled(!FREECAM.isEnabled(), player, mc);
             }
@@ -200,6 +208,7 @@ public final class TweaksClient {
 
         AUTO_FISHING.onClientTick(mc, player);
         AUTO_CLICK.onClientTick(mc, player);
+        AUTO_TOOL.onClientTick(mc, player);
         FREECAM.onClientTick(mc, player);
         FULLBRIGHT.onClientTick(mc, player);
         XRAY_TWEAK.onClientTick(mc, player);
@@ -244,6 +253,7 @@ public final class TweaksClient {
         syncTrackedKeyState(TweaksClientSettings.getConfigKeyCode());
         syncTrackedKeyState(TweaksClientSettings.getFishingKeyCode());
         syncTrackedKeyState(TweaksClientSettings.getAutoClickKeyCode());
+        syncTrackedKeyState(TweaksClientSettings.getAutoToolKeyCode());
         syncTrackedKeyState(TweaksClientSettings.getFreecamKeyCode());
         syncTrackedKeyState(TweaksClientSettings.getFullbrightKeyCode());
         syncTrackedKeyState(TweaksClientSettings.getXRayKeyCode());
