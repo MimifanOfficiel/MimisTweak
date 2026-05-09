@@ -56,6 +56,7 @@
   "screen.mimistweaks.tweak.fullbright": "Fullbright",
   "screen.mimistweaks.tweak.sortinventory": "Tri d'inventaire",
   "screen.mimistweaks.tweak.mousetweaks": "Mouse Tweaks",
+  "screen.mimistweaks.tweak.macros": "Macros",
   "screen.mimistweaks.tweak.xray": "X-Ray",
 
   "screen.mimistweaks.autofishing.sensitivity": "Sensibilite morsure peche : %s",
@@ -77,6 +78,24 @@
   "screen.mimistweaks.autoclick.allow_unfocused": "Continuer sans le focus",
 
   "screen.mimistweaks.autotool.search_inventory": "Chercher dans tout l'inventaire",
+
+  "screen.mimistweaks.macros.btn.configure": "Configurer",
+  "screen.mimistweaks.macros.title": "Macros",
+  "screen.mimistweaks.macros.empty": "Aucune macro. Clique sur Ajouter une macro.",
+  "screen.mimistweaks.macros.empty_hint": "Astuce : utilise /commande pour une commande, sinon c'est un message chat.",
+  "screen.mimistweaks.macros.subtitle": "Cree des raccourcis pratiques et lance-les instantanement",
+  "screen.mimistweaks.macros.column.text": "Macro",
+  "screen.mimistweaks.macros.column.keybind": "Touche",
+  "screen.mimistweaks.macros.column.enabled": "On",
+  "screen.mimistweaks.macros.column.delete": "Suppr.",
+  "screen.mimistweaks.macros.count": "%s macros",
+  "screen.mimistweaks.macros.text": "Texte macro",
+  "screen.mimistweaks.macros.text_hint": "/commande ou message chat",
+  "screen.mimistweaks.macros.keybind_capturing": "Appuie sur une touche...",
+  "screen.mimistweaks.macros.btn.add": "Ajouter une macro",
+  "screen.mimistweaks.macros.btn.delete": "Supprimer",
+  "screen.mimistweaks.macros.btn.confirm_delete": "Confirmer ?",
+  "screen.mimistweaks.macros.btn.done": "Terminer",
 
   "screen.mimistweaks.freecam.stop_on_screens": "Stop si GUI ouvert",
   "screen.mimistweaks.freecam.allow_unfocused": "Continuer sans le focus",

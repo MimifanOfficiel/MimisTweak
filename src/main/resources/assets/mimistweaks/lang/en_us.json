@@ -56,6 +56,7 @@
   "screen.mimistweaks.tweak.fullbright": "Fullbright",
   "screen.mimistweaks.tweak.sortinventory": "Sort Inventory",
   "screen.mimistweaks.tweak.mousetweaks": "Mouse Tweaks",
+  "screen.mimistweaks.tweak.macros": "Macros",
   "screen.mimistweaks.tweak.xray": "X-Ray",
 
   "screen.mimistweaks.autofishing.sensitivity": "Fishing bite sensitivity: %s",
@@ -77,6 +78,24 @@
   "screen.mimistweaks.autoclick.allow_unfocused": "Allow when unfocused",
 
   "screen.mimistweaks.autotool.search_inventory": "Search full inventory",
+
+  "screen.mimistweaks.macros.btn.configure": "Configure",
+  "screen.mimistweaks.macros.title": "Macros",
+  "screen.mimistweaks.macros.empty": "No macros yet. Click Add New Macro.",
+  "screen.mimistweaks.macros.empty_hint": "Tip: use /command for commands, or plain text for chat messages.",
+  "screen.mimistweaks.macros.subtitle": "Build your shortcuts and trigger actions instantly",
+  "screen.mimistweaks.macros.column.text": "Macro",
+  "screen.mimistweaks.macros.column.keybind": "Key",
+  "screen.mimistweaks.macros.column.enabled": "On",
+  "screen.mimistweaks.macros.column.delete": "Delete",
+  "screen.mimistweaks.macros.count": "%s macros",
+  "screen.mimistweaks.macros.text": "Macro text",
+  "screen.mimistweaks.macros.text_hint": "/command or chat message",
+  "screen.mimistweaks.macros.keybind_capturing": "Press key...",
+  "screen.mimistweaks.macros.btn.add": "Add New Macro",
+  "screen.mimistweaks.macros.btn.delete": "Delete",
+  "screen.mimistweaks.macros.btn.confirm_delete": "Confirm?",
+  "screen.mimistweaks.macros.btn.done": "Done",
 
   "screen.mimistweaks.freecam.stop_on_screens": "Stop on opened screens",
   "screen.mimistweaks.freecam.allow_unfocused": "Allow when unfocused",

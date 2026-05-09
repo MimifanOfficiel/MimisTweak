@@ -66,6 +66,7 @@ public class TweaksConfigScreen extends Screen {
                 case FULLBRIGHT      -> TweaksClientSettings.getFullbrightKeyCode();
                 case SORT_INVENTORY  -> TweaksClientSettings.getSortKeyCode();
                 case MOUSE_TWEAKS    -> TweaksClientSettings.getMouseTweaksKeyCode();
+                case MACROS          -> TweaksClientSettings.KEY_UNBOUND;
                 case XRAY            -> TweaksClientSettings.getXRayKeyCode();
                 case TARGET_INFO     -> TweaksClientSettings.getTargetInfoKeyCode();
             };
@@ -81,9 +82,18 @@ public class TweaksConfigScreen extends Screen {
                 case FULLBRIGHT      -> TweaksClientSettings.setFullbrightKeyCode(code);
                 case SORT_INVENTORY  -> TweaksClientSettings.setSortKeyCode(code);
                 case MOUSE_TWEAKS    -> TweaksClientSettings.setMouseTweaksKeyCode(code);
+                case MACROS          -> { }
                 case XRAY            -> TweaksClientSettings.setXRayKeyCode(code);
                 case TARGET_INFO     -> TweaksClientSettings.setTargetInfoKeyCode(code);
             }
+        }
+
+        boolean supportsHeaderKeybind() {
+            return tweak != TweaksClient.Tweak.MACROS;
+        }
+
+        boolean supportsHeaderToggle() {
+            return tweak != TweaksClient.Tweak.MACROS;
         }
     }
 
@@ -281,6 +291,14 @@ public class TweaksConfigScreen extends Screen {
 
             TweakEntry mouseTweaks = new TweakEntry(TweaksClient.Tweak.MOUSE_TWEAKS, "screen.mimistweaks.tweak.mousetweaks");
             panel.tweaks.add(mouseTweaks);
+
+            TweakEntry macros = new TweakEntry(TweaksClient.Tweak.MACROS, "screen.mimistweaks.tweak.macros");
+            macros.expanded = TweaksClientSettings.getTweakExpanded(TweaksClient.Tweak.MACROS);
+            macros.widgets.add(addRenderableWidget(Button.builder(
+                    Component.translatable("screen.mimistweaks.macros.btn.configure"),
+                    b -> minecraft.setScreen(new MacrosConfigScreen(this)))
+                    .bounds(0, 0, 200, WIDGET_HEIGHT).build()));
+            panel.tweaks.add(macros);
         } else if (category == Category.RENDER) {
             TweakEntry fullbright = new TweakEntry(TweaksClient.Tweak.FULLBRIGHT, "screen.mimistweaks.tweak.fullbright");
             fullbright.expanded = TweaksClientSettings.getTweakExpanded(TweaksClient.Tweak.FULLBRIGHT);
@@ -520,13 +538,19 @@ public class TweaksConfigScreen extends Screen {
                             // Click on key-bind area (right portion)?
                             int keyAreaLeft = tweak.headerX + tweak.headerWidth - 68;
                             int keyAreaRight = tweak.headerX + tweak.headerWidth - 18;
-                            if (mouseX >= keyAreaLeft && mouseX <= keyAreaRight) {
+                            if (tweak.supportsHeaderKeybind() && mouseX >= keyAreaLeft && mouseX <= keyAreaRight) {
                                 capturingKeyTweak = tweak;
                                 return true;
                             }
-                            // Otherwise toggle tweak
-                            boolean nextState = !TweaksClient.isTweakEnabled(tweak.tweak);
-                            TweaksClient.setTweakEnabledFromUi(tweak.tweak, nextState);
+                            if (tweak.supportsHeaderToggle()) {
+                                boolean nextState = !TweaksClient.isTweakEnabled(tweak.tweak);
+                                TweaksClient.setTweakEnabledFromUi(tweak.tweak, nextState);
+                            } else {
+                                tweak.expanded = !tweak.expanded;
+                                TweaksClientSettings.setTweakExpanded(tweak.tweak, tweak.expanded);
+                                ConfigPersistence.save();
+                                layoutPanel(panel);
+                            }
                             return true;
                         }
                     }
@@ -616,11 +640,13 @@ public class TweaksConfigScreen extends Screen {
                     guiGraphics.drawString(this.font, Component.translatable(tweak.nameKey), tLeft + 6, tTop + 4, textColor, true);
 
                     // Key binding display (right side, before the expand arrow)
-                    int kc = tweak.getKeyCode();
-                    String keyLabel = capturing ? "Press key or mouse..." : TweaksClientSettings.getKeybindDisplayName(kc);
-                    int keyLabelColor = capturing ? 0xFFFFDD88 : 0xFF88AADD;
-                    guiGraphics.fill(tRight - 70, tTop + 2, tRight - 17, tBottom - 2, 0xBB000000);
-                    guiGraphics.drawString(this.font, "[" + keyLabel + "]", tRight - 68, tTop + 4, keyLabelColor, false);
+                    if (tweak.supportsHeaderKeybind()) {
+                        int kc = tweak.getKeyCode();
+                        String keyLabel = capturing ? "Press key or mouse..." : TweaksClientSettings.getKeybindDisplayName(kc);
+                        int keyLabelColor = capturing ? 0xFFFFDD88 : 0xFF88AADD;
+                        guiGraphics.fill(tRight - 70, tTop + 2, tRight - 17, tBottom - 2, 0xBB000000);
+                        guiGraphics.drawString(this.font, "[" + keyLabel + "]", tRight - 68, tTop + 4, keyLabelColor, false);
+                    }
 
                     // Expand arrow
                     guiGraphics.drawString(this.font, tweak.expanded ? "▾" : "▸", tRight - 12, tTop + 4, accent, true);

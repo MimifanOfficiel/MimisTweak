@@ -9,6 +9,8 @@ import net.neoforged.fml.loading.FMLPaths;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class ConfigPersistence {
     private static final String FILE_NAME = "mimistweaks.json";
@@ -68,6 +70,15 @@ public final class ConfigPersistence {
         obj.addProperty("zoomKeyCode",      TweaksClientSettings.getZoomKeyCode());
         obj.addProperty("fullbrightKeyCode", TweaksClientSettings.getFullbrightKeyCode());
         obj.addProperty("targetInfoKeyCode", TweaksClientSettings.getTargetInfoKeyCode());
+        JsonArray macros = new JsonArray();
+        for (TweaksClientSettings.MacroEntry macro : TweaksClientSettings.getMacros()) {
+            JsonObject macroObj = new JsonObject();
+            macroObj.addProperty("text", macro.getText());
+            macroObj.addProperty("keyCode", macro.getKeyCode());
+            macroObj.addProperty("enabled", macro.isEnabled());
+            macros.add(macroObj);
+        }
+        obj.add("macros", macros);
         // Sort Inventory
         obj.addProperty("sortKeyCode",  TweaksClientSettings.getSortKeyCode());
         obj.addProperty("mouseTweaksKeyCode", TweaksClientSettings.getMouseTweaksKeyCode());
@@ -139,6 +150,20 @@ public final class ConfigPersistence {
             if (obj.has("zoomKeyCode"))      TweaksClientSettings.setZoomKeyCode(obj.get("zoomKeyCode").getAsInt());
             if (obj.has("fullbrightKeyCode")) TweaksClientSettings.setFullbrightKeyCode(obj.get("fullbrightKeyCode").getAsInt());
             if (obj.has("targetInfoKeyCode")) TweaksClientSettings.setTargetInfoKeyCode(obj.get("targetInfoKeyCode").getAsInt());
+            if (obj.has("macros")) {
+                List<TweaksClientSettings.MacroEntry> macros = new ArrayList<>();
+                for (JsonElement element : obj.getAsJsonArray("macros")) {
+                    if (!element.isJsonObject()) {
+                        continue;
+                    }
+                    JsonObject macroObj = element.getAsJsonObject();
+                    String text = macroObj.has("text") ? macroObj.get("text").getAsString() : "";
+                    int keyCode = macroObj.has("keyCode") ? macroObj.get("keyCode").getAsInt() : TweaksClientSettings.KEY_UNBOUND;
+                    boolean enabled = !macroObj.has("enabled") || macroObj.get("enabled").getAsBoolean();
+                    macros.add(new TweaksClientSettings.MacroEntry(text, keyCode, enabled));
+                }
+                TweaksClientSettings.setMacros(macros);
+            }
             if (obj.has("sortKeyCode"))  TweaksClientSettings.setSortKeyCode(obj.get("sortKeyCode").getAsInt());
             if (obj.has("mouseTweaksKeyCode")) TweaksClientSettings.setMouseTweaksKeyCode(obj.get("mouseTweaksKeyCode").getAsInt());
             if (obj.has("sortMode"))     TweaksClientSettings.setSortMode(InventorySortHelper.SortMode.valueOf(obj.get("sortMode").getAsString()));

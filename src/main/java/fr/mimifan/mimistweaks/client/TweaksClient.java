@@ -39,7 +39,7 @@ import java.util.Set;
 @EventBusSubscriber(modid = MimisTweaks.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public final class TweaksClient {
 
-    public enum Tweak { AUTO_FISHING, AUTO_CLICK, AUTO_TOOL, FREECAM, ZOOM, FULLBRIGHT, SORT_INVENTORY, MOUSE_TWEAKS, XRAY, TARGET_INFO }
+    public enum Tweak { AUTO_FISHING, AUTO_CLICK, AUTO_TOOL, FREECAM, ZOOM, FULLBRIGHT, SORT_INVENTORY, MOUSE_TWEAKS, MACROS, XRAY, TARGET_INFO }
 
     private static final AutoFishingTweak AUTO_FISHING = new AutoFishingTweak();
     private static final AutoClickTweak AUTO_CLICK = new AutoClickTweak();
@@ -81,6 +81,7 @@ public final class TweaksClient {
             case FULLBRIGHT      -> FULLBRIGHT.isEnabled();
             case SORT_INVENTORY  -> SORT_INVENTORY_TWEAK.isEnabled();
             case MOUSE_TWEAKS    -> MOUSE_TWEAKS.isEnabled();
+            case MACROS          -> true;
             case XRAY            -> XRAY_TWEAK.isEnabled();
             case TARGET_INFO     -> TARGET_INFO_TWEAK.isEnabled();
         };
@@ -102,6 +103,7 @@ public final class TweaksClient {
             case FULLBRIGHT     -> FULLBRIGHT.setEnabled(enabled, player, mc);
             case SORT_INVENTORY -> SORT_INVENTORY_TWEAK.setEnabled(enabled, player, mc);
             case MOUSE_TWEAKS   -> MOUSE_TWEAKS.setEnabled(enabled, player, mc);
+            case MACROS         -> { /* config-only module */ }
             case XRAY           -> XRAY_TWEAK.setEnabled(enabled, player, mc);
             case TARGET_INFO    -> TARGET_INFO_TWEAK.setEnabled(enabled, player, mc);
         }
@@ -203,6 +205,8 @@ public final class TweaksClient {
                 triggerPlayerSort();
             }
 
+            processMacroKeybinds(player);
+
             ZOOM.setHeld(isKeyHeld(TweaksClientSettings.getZoomKeyCode()));
         }
 
@@ -260,6 +264,35 @@ public final class TweaksClient {
         syncTrackedKeyState(TweaksClientSettings.getSortKeyCode());
         syncTrackedKeyState(TweaksClientSettings.getZoomKeyCode());
         syncTrackedKeyState(TweaksClientSettings.getTargetInfoKeyCode());
+        for (TweaksClientSettings.MacroEntry macro : TweaksClientSettings.getMacros()) {
+            syncTrackedKeyState(macro.getKeyCode());
+        }
+    }
+
+    private static void processMacroKeybinds(LocalPlayer player) {
+        for (TweaksClientSettings.MacroEntry macro : TweaksClientSettings.getMacros()) {
+            if (!macro.isEnabled()) {
+                continue;
+            }
+            int keyCode = macro.getKeyCode();
+            if (!consumeKeyPress(keyCode)) {
+                continue;
+            }
+
+            String text = macro.getText().trim();
+            if (text.isEmpty()) {
+                return;
+            }
+            if (text.startsWith("/")) {
+                String command = text.substring(1).trim();
+                if (!command.isEmpty()) {
+                    player.connection.sendCommand(command);
+                }
+            } else {
+                player.connection.sendChat(text);
+            }
+            return;
+        }
     }
 
     private static void syncTrackedKeyState(int keyCode) {

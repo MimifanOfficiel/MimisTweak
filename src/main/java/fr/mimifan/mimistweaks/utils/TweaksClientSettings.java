@@ -6,6 +6,8 @@ import fr.mimifan.mimistweaks.client.tweaks.InventorySortHelper;
 import net.minecraft.util.Mth;
 
 import java.util.EnumMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -75,6 +77,51 @@ public final class TweaksClientSettings {
     private static boolean targetInfoShowModName = true;
     private static boolean targetInfoShowHealth = true;
     private static boolean targetInfoShowPlayerEquipment = true;
+    private static final List<MacroEntry> macros = new ArrayList<>();
+
+    public static final class MacroEntry {
+        private String text;
+        private int keyCode;
+        private boolean enabled;
+
+        public MacroEntry() {
+            this("", KEY_UNBOUND, true);
+        }
+
+        public MacroEntry(String text, int keyCode, boolean enabled) {
+            this.text = text == null ? "" : text;
+            this.keyCode = sanitizeKeyCode(keyCode);
+            this.enabled = enabled;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text == null ? "" : text;
+        }
+
+        public int getKeyCode() {
+            return keyCode;
+        }
+
+        public void setKeyCode(int keyCode) {
+            this.keyCode = sanitizeKeyCode(keyCode);
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public MacroEntry copy() {
+            return new MacroEntry(text, keyCode, enabled);
+        }
+    }
 
     private TweaksClientSettings() {}
 
@@ -409,6 +456,26 @@ public final class TweaksClientSettings {
 
     public static void setTargetInfoShowPlayerEquipment(boolean value) {
         targetInfoShowPlayerEquipment = value;
+    }
+
+    public static List<MacroEntry> getMacros() {
+        List<MacroEntry> copy = new ArrayList<>();
+        for (MacroEntry macro : macros) {
+            copy.add(macro.copy());
+        }
+        return copy;
+    }
+
+    public static void setMacros(List<MacroEntry> values) {
+        macros.clear();
+        if (values == null) {
+            return;
+        }
+        for (MacroEntry value : values) {
+            if (value != null) {
+                macros.add(value.copy());
+            }
+        }
     }
 
     public static int encodeMouseButton(int mouseButton) {
