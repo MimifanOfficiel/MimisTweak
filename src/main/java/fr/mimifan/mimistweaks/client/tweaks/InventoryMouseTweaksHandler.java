@@ -5,9 +5,11 @@ import fr.mimifan.mimistweaks.client.TweaksClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -30,7 +32,6 @@ public final class InventoryMouseTweaksHandler {
 
     private static boolean shiftDragActive = false;
     private static boolean collectDragActive = false;
-    private static boolean collectPerformed = false;
 
     private static int activeContainerId = -1;
 
@@ -46,6 +47,11 @@ public final class InventoryMouseTweaksHandler {
 
         Screen screen = event.getScreen();
         if (!(screen instanceof AbstractContainerScreen<?> containerScreen)) {
+            return;
+        }
+
+        if (!isMouseTweaksSupportedScreen(containerScreen)) {
+            stopAllDragging();
             return;
         }
 
@@ -66,6 +72,11 @@ public final class InventoryMouseTweaksHandler {
 
         AbstractContainerMenu menu = containerScreen.getMenu();
 
+        int slotId = getMenuSlotId(menu, slot);
+        if (slotId < 0) {
+            return;
+        }
+
         /*
          * SHIFT DRAG
          */
@@ -77,9 +88,9 @@ public final class InventoryMouseTweaksHandler {
 
             beginShiftDrag(menu);
 
-            quickMove(menu, slot.index, player);
+            quickMove(menu, slotId, player);
 
-            dragVisitedSlots.add(slot.index);
+            dragVisitedSlots.add(slotId);
 
             event.setCanceled(true);
             return;
@@ -89,13 +100,11 @@ public final class InventoryMouseTweaksHandler {
          * COLLECT DRAG
          */
         if (menu.getCarried().isEmpty() && canCollectStart(slot, player)) {
-
-            // Pickup initial manuel
-            pickupSlot(menu, slot.index, player);
+            pickupSlot(menu, slotId, player);
 
             beginCollectDrag(menu);
 
-            dragVisitedSlots.add(slot.index);
+            dragVisitedSlots.add(slotId);
 
             event.setCanceled(true);
         }
@@ -116,6 +125,11 @@ public final class InventoryMouseTweaksHandler {
         Screen screen = event.getScreen();
 
         if (!(screen instanceof AbstractContainerScreen<?> containerScreen)) {
+            stopAllDragging();
+            return;
+        }
+
+        if (!isMouseTweaksSupportedScreen(containerScreen)) {
             stopAllDragging();
             return;
         }
@@ -145,6 +159,12 @@ public final class InventoryMouseTweaksHandler {
             return;
         }
 
+        int slotId = getMenuSlotId(menu, slot);
+        if (slotId < 0) {
+            event.setCanceled(true);
+            return;
+        }
+
         /*
          * SHIFT DRAG
          */
@@ -159,11 +179,11 @@ public final class InventoryMouseTweaksHandler {
                 return;
             }
 
-            if (!dragVisitedSlots.add(slot.index)) {
+            if (!dragVisitedSlots.add(slotId)) {
                 return;
             }
 
-            quickMove(menu, slot.index, player);
+            quickMove(menu, slotId, player);
 
             event.setCanceled(true);
             return;
@@ -191,18 +211,12 @@ public final class InventoryMouseTweaksHandler {
                 return;
             }
 
-            /*
-             * IMPORTANT :
-             * On utilise PICKUP_ALL une seule fois
-             * pour reproduire le vrai comportement
-             * MouseTweaks sans déposer d'items.
-             */
-            if (!collectPerformed) {
-
-                collectAllToCursor(menu, slot.index, player);
-
-                collectPerformed = true;
+            if (!dragVisitedSlots.add(slotId)) {
+                event.setCanceled(true);
+                return;
             }
+
+            collectAllToCursor(menu, slotId, player);
 
             event.setCanceled(true);
         }
@@ -239,6 +253,10 @@ public final class InventoryMouseTweaksHandler {
             return;
         }
 
+        if (!isMouseTweaksSupportedScreen(containerScreen)) {
+            return;
+        }
+
         AbstractContainerMenu menu = containerScreen.getMenu();
 
         if (!ContainerSortButtonsHandler.isStorageMenu(menu)) {
@@ -265,6 +283,11 @@ public final class InventoryMouseTweaksHandler {
             return;
         }
 
+        int hoveredSlotId = getMenuSlotId(menu, hovered);
+        if (hoveredSlotId < 0) {
+            return;
+        }
+
         int containerSize =
                 ContainerSortButtonsHandler.getContainerSize(menu);
 
@@ -275,7 +298,7 @@ public final class InventoryMouseTweaksHandler {
         }
 
         boolean hoveredInContainer =
-                hovered.index < containerSize;
+                hoveredSlotId < containerSize;
 
         int hoveredStart =
                 hoveredInContainer ? 0 : containerSize;
@@ -306,7 +329,7 @@ public final class InventoryMouseTweaksHandler {
 
         ItemStack filter = hovered.getItem().copy();
 
-        Slot source = findFirstMatchingSourceSlot(
+        int sourceSlotId = findFirstMatchingSourceSlotId(
                 menu,
                 sourceStart,
                 sourceEnd,
@@ -314,25 +337,25 @@ public final class InventoryMouseTweaksHandler {
                 player
         );
 
-        if (source == null) {
+        if (sourceSlotId < 0) {
             return;
         }
 
-        Slot target = findBestSingleItemTargetSlot(
+        int targetSlotId = findBestSingleItemTargetSlotId(
                 menu,
                 targetStart,
                 targetEnd,
                 filter
         );
 
-        if (target == null) {
+        if (targetSlotId < 0) {
             return;
         }
 
         moveExactlyOneItem(
                 menu,
-                source.index,
-                target.index,
+                sourceSlotId,
+                targetSlotId,
                 player
         );
 
@@ -359,8 +382,6 @@ public final class InventoryMouseTweaksHandler {
         collectDragActive = true;
         shiftDragActive = false;
 
-        collectPerformed = false;
-
         activeContainerId = menu.containerId;
 
         dragVisitedSlots.clear();
@@ -382,8 +403,6 @@ public final class InventoryMouseTweaksHandler {
 
         collectDragActive = false;
 
-        collectPerformed = false;
-
         if (!shiftDragActive) {
 
             activeContainerId = -1;
@@ -397,16 +416,20 @@ public final class InventoryMouseTweaksHandler {
         shiftDragActive = false;
         collectDragActive = false;
 
-        collectPerformed = false;
-
         activeContainerId = -1;
 
         dragVisitedSlots.clear();
     }
 
+
+    private static boolean isMouseTweaksSupportedScreen(AbstractContainerScreen<?> screen) {
+        return !(screen instanceof CreativeModeInventoryScreen);
+    }
+
     private static boolean canQuickMove(Slot slot, LocalPlayer player) {
 
         return slot != null
+                && slot.isActive()
                 && slot.hasItem()
                 && slot.mayPickup(player);
     }
@@ -414,6 +437,8 @@ public final class InventoryMouseTweaksHandler {
     private static boolean canCollectStart(Slot slot, LocalPlayer player) {
 
         return slot.hasItem()
+                && slot.isActive()
+                && !isResultLikeSlot(slot)
                 && slot.mayPickup(player);
     }
 
@@ -427,7 +452,15 @@ public final class InventoryMouseTweaksHandler {
             return false;
         }
 
+        if (!slot.isActive()) {
+            return false;
+        }
+
         if (!slot.mayPickup(player)) {
+            return false;
+        }
+
+        if (isResultLikeSlot(slot)) {
             return false;
         }
 
@@ -538,7 +571,7 @@ public final class InventoryMouseTweaksHandler {
         );
     }
 
-    private static Slot findFirstMatchingSourceSlot(
+    private static int findFirstMatchingSourceSlotId(
             AbstractContainerMenu menu,
             int start,
             int end,
@@ -560,15 +593,19 @@ public final class InventoryMouseTweaksHandler {
                 continue;
             }
 
+            if (isResultLikeSlot(slot)) {
+                continue;
+            }
+
             if (ItemStack.isSameItemSameTags(stack, filter)) {
-                return slot;
+                return i;
             }
         }
 
-        return null;
+        return -1;
     }
 
-    private static Slot findBestSingleItemTargetSlot(
+    private static int findBestSingleItemTargetSlotId(
             AbstractContainerMenu menu,
             int start,
             int end,
@@ -589,6 +626,10 @@ public final class InventoryMouseTweaksHandler {
                 continue;
             }
 
+            if (isResultLikeSlot(slot)) {
+                continue;
+            }
+
             if (!ItemStack.isSameItemSameTags(stack, itemToMove)) {
                 continue;
             }
@@ -599,7 +640,7 @@ public final class InventoryMouseTweaksHandler {
             );
 
             if (stack.getCount() < max) {
-                return slot;
+                return i;
             }
         }
 
@@ -615,10 +656,22 @@ public final class InventoryMouseTweaksHandler {
                 continue;
             }
 
-            return slot;
+            if (isResultLikeSlot(slot)) {
+                continue;
+            }
+
+            return i;
         }
 
-        return null;
+        return -1;
+    }
+
+    private static int getMenuSlotId(AbstractContainerMenu menu, Slot slot) {
+        return menu.slots.indexOf(slot);
+    }
+
+    private static boolean isResultLikeSlot(Slot slot) {
+        return slot instanceof ResultSlot;
     }
 
     private static Slot findSlotUnderMouse(
@@ -640,6 +693,10 @@ public final class InventoryMouseTweaksHandler {
         );
 
         for (Slot slot : screen.getMenu().slots) {
+
+            if (!slot.isActive()) {
+                continue;
+            }
 
             int slotX = leftPos + slot.x;
             int slotY = topPos + slot.y;

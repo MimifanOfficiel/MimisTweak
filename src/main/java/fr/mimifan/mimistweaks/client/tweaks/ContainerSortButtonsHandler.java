@@ -191,14 +191,14 @@ public final class ContainerSortButtonsHandler {
         TweaksClient.triggerContainerSort(menu, containerSize);
     }
 
-    static boolean isStorageMenu(AbstractContainerMenu menu) {
+    public static boolean isStorageMenu(AbstractContainerMenu menu) {
         return menu instanceof ChestMenu
                 || menu instanceof ShulkerBoxMenu
                 || menu instanceof HopperMenu
                 || menu instanceof DispenserMenu;
     }
 
-    static int getContainerSize(AbstractContainerMenu menu) {
+    public static int getContainerSize(AbstractContainerMenu menu) {
         if (menu instanceof ChestMenu cm) {
             return cm.getRowCount() * 9;
         }

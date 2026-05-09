@@ -73,9 +73,17 @@ public final class InventorySortTweak implements ClientTweak {
             current.add(menu.slots.get(i).getItem().copy());
         }
 
-        List<ItemStack> sorted = InventorySortHelper.sortItems(current, mode, order);
         ItemStack[] cur = current.toArray(new ItemStack[0]);
         int containerId = menu.containerId;
+
+        // First compact identical stacks in-place to save space before reordering.
+        compactStacksInPlace(cur, start, containerId);
+
+        List<ItemStack> compacted = new ArrayList<>(cur.length);
+        for (ItemStack stack : cur) {
+            compacted.add(stack.copy());
+        }
+        List<ItemStack> sorted = InventorySortHelper.sortItems(compacted, mode, order);
 
         for (int i = 0; i < sorted.size(); i++) {
             if (sorted.get(i).isEmpty()) break;
@@ -132,6 +140,45 @@ public final class InventorySortTweak implements ClientTweak {
             ItemStack tmp = cur[i];
             cur[i] = cur[j];
             cur[j] = tmp;
+        }
+    }
+
+    private void compactStacksInPlace(ItemStack[] cur, int start, int containerId) {
+        for (int i = 0; i < cur.length; i++) {
+            if (cur[i].isEmpty()) continue;
+
+            int maxStackSize = cur[i].getMaxStackSize();
+            if (cur[i].getCount() >= maxStackSize) continue;
+
+            for (int j = i + 1; j < cur.length; j++) {
+                if (!sameItemType(cur[i], cur[j])) continue;
+
+                int free = maxStackSize - cur[i].getCount();
+                if (free <= 0) break;
+
+                int move = Math.min(free, cur[j].getCount());
+                if (move <= 0) continue;
+
+                int slotI = start + i;
+                int slotJ = start + j;
+
+                // Pick up stack J, merge into I, then put back leftovers in J if needed.
+                pendingOps.add(new int[]{containerId, slotJ, 0});
+                pendingOps.add(new int[]{containerId, slotI, 0});
+                if (cur[j].getCount() > move) {
+                    pendingOps.add(new int[]{containerId, slotJ, 0});
+                }
+
+                cur[i].grow(move);
+                cur[j].shrink(move);
+                if (cur[j].getCount() <= 0) {
+                    cur[j] = ItemStack.EMPTY;
+                }
+
+                if (cur[i].getCount() >= maxStackSize) {
+                    break;
+                }
+            }
         }
     }
 

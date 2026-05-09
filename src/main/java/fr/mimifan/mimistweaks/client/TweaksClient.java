@@ -10,7 +10,9 @@ import fr.mimifan.mimistweaks.client.tweaks.InventorySortTweak;
 import fr.mimifan.mimistweaks.client.tweaks.InventoryMouseTweaksTweak;
 import fr.mimifan.mimistweaks.client.tweaks.TargetInfoTweak;
 import fr.mimifan.mimistweaks.client.tweaks.XRayTweak;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import fr.mimifan.mimistweaks.client.tweaks.ContainerSortButtonsHandler;
 import fr.mimifan.mimistweaks.client.tweaks.ZoomTweak;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import fr.mimifan.mimistweaks.screens.TweaksConfigScreen;
@@ -122,6 +124,20 @@ public final class TweaksClient {
                 TweaksClientSettings.getSortOrder());
     }
 
+    /** Trigger a sort based on the currently open container screen (called from the sort keybind). */
+    public static void triggerSortForScreen(AbstractContainerScreen<?> screen) {
+        if (screen instanceof InventoryScreen) {
+            triggerPlayerSort();
+            return;
+        }
+        AbstractContainerMenu menu = screen.getMenu();
+        if (!ContainerSortButtonsHandler.isStorageMenu(menu)) return;
+        int containerSize = ContainerSortButtonsHandler.getContainerSize(menu);
+        if (containerSize > 0) {
+            triggerContainerSort(menu, containerSize);
+        }
+    }
+
     private static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) {
             return;
@@ -136,7 +152,13 @@ public final class TweaksClient {
         // Keep only the config-menu key synced with Minecraft Controls.
         TweaksClientSettings.setConfigKeyCode(MimisKeybinds.getConfigKeyCode());
         if (mc.screen != null) {
-            // Ignore all hotkeys while a GUI is open (chat, inventory, menus, config screens, ...).
+            // Allow the sort keybind to trigger a sort while a container/inventory screen is open.
+            if (SORT_INVENTORY_TWEAK.isEnabled()
+                    && mc.screen instanceof AbstractContainerScreen<?> cs
+                    && consumeKeyPress(TweaksClientSettings.getSortKeyCode())) {
+                triggerSortForScreen(cs);
+            }
+            // Ignore all other hotkeys while a GUI is open.
             syncTrackedKeyStateToCurrent();
             ZOOM.setHeld(false);
         } else {
