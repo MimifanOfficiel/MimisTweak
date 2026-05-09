@@ -18,6 +18,8 @@ public final class FreecamTweak implements ClientTweak {
 
     private boolean prevMayfly;
     private boolean prevFlying;
+    private boolean prevNoPhysics;
+    private Entity prevCameraEntity;
 
     private double savedX, savedY, savedZ;
     private float savedYRot, savedXRot;
@@ -46,15 +48,30 @@ public final class FreecamTweak implements ClientTweak {
     public void onClientTick(Minecraft mc, LocalPlayer player) {
         if (!enabled || camera == null) return;
 
-        // =========================
-        // 🎯 ROTATION = PLAYER (stable)
-        // =========================
-        yaw = player.getYRot();
-        pitch = player.getXRot();
+        if (TweaksClient.shouldStopForUnfocusedWindow(mc, TweaksClientSettings.isFreecamAllowWhenUnfocused())) {
+            stop(player, mc, "message.mimistweaks.freecam.stopped_unfocused");
+            return;
+        }
 
-        // =========================
-        // 🎮 INPUT
-        // =========================
+        if (TweaksClient.shouldStopForOpenedScreen(mc, TweaksClientSettings.isFreecamStopOnOpenedScreen())) {
+            stop(player, mc, "message.mimistweaks.freecam.stopped_gui");
+            return;
+        }
+
+        // Convert mouse look into freecam rotation, then lock player view back in place.
+        float deltaYaw = Mth.wrapDegrees(player.getYRot() - savedYRot);
+        float deltaPitch = player.getXRot() - savedXRot;
+        yaw = Mth.wrapDegrees(yaw + deltaYaw);
+        pitch = Mth.clamp(pitch + deltaPitch, -90.0f, 90.0f);
+        player.setYRot(savedYRot);
+        player.setXRot(savedXRot);
+        player.yRotO = savedYRot;
+        player.xRotO = savedXRot;
+        player.setYHeadRot(savedYRot);
+        player.yHeadRotO = savedYRot;
+        player.setYBodyRot(savedYRot);
+        player.yBodyRotO = savedYRot;
+
         float speed = 0.3f;
         if (mc.options.keySprint.isDown()) speed *= 2.5f;
 
@@ -70,12 +87,12 @@ public final class FreecamTweak implements ClientTweak {
 
         double mx = 0, my = 0, mz = 0;
 
-        if (player.input.up) { mx += fx; my += fy; mz += fz; }
-        if (player.input.down) { mx -= fx; my -= fy; mz -= fz; }
-        if (player.input.left) { mx -= rx; mz -= rz; }
-        if (player.input.right) { mx += rx; mz += rz; }
-        if (player.input.jumping) my += 1;
-        if (player.input.shiftKeyDown) my -= 1;
+        if (mc.options.keyUp.isDown()) { mx += fx; my += fy; mz += fz; }
+        if (mc.options.keyDown.isDown()) { mx -= fx; my -= fy; mz -= fz; }
+        if (mc.options.keyLeft.isDown()) { mx -= rx; mz -= rz; }
+        if (mc.options.keyRight.isDown()) { mx += rx; mz += rz; }
+        if (mc.options.keyJump.isDown()) my += 1;
+        if (mc.options.keyShift.isDown()) my -= 1;
 
         double len = Math.sqrt(mx*mx + my*my + mz*mz);
         if (len > 0) {
@@ -88,28 +105,26 @@ public final class FreecamTweak implements ClientTweak {
         double ny = camera.getY() + my;
         double nz = camera.getZ() + mz;
 
-        // =========================
-        // 🚀 POSITION FIX
-        // =========================
         camera.setPos(nx, ny, nz);
-
-        // 🔥 CRITIQUE (anti jitter)
         camera.xo = nx;
         camera.yo = ny;
         camera.zo = nz;
-
         camera.setYRot(yaw);
         camera.setXRot(pitch);
+        camera.yRotO = yaw;
+        camera.xRotO = pitch;
+        camera.setYHeadRot(yaw);
+        camera.setYBodyRot(yaw);
 
-        // =========================
-        // 🧊 FREEZE PLAYER (SANS rotation)
-        // =========================
+        // Keep server-side player body fully frozen while freecam moves locally.
+        player.setPos(savedX, savedY, savedZ);
+        player.xo = savedX;
+        player.yo = savedY;
+        player.zo = savedZ;
         player.setDeltaMovement(Vec3.ZERO);
         player.input.forwardImpulse = 0;
         player.input.leftImpulse = 0;
         player.setSprinting(false);
-
-        // NE PAS reset rotation !!!
 
         if (mc.getCameraEntity() != camera) {
             mc.setCameraEntity(camera);
@@ -117,10 +132,16 @@ public final class FreecamTweak implements ClientTweak {
     }
 
     private void start(LocalPlayer player, Minecraft mc) {
+        if (mc.level == null) {
+            return;
+        }
+
         enabled = true;
 
         prevMayfly = player.getAbilities().mayfly;
         prevFlying = player.getAbilities().flying;
+        prevNoPhysics = player.noPhysics;
+        prevCameraEntity = mc.getCameraEntity();
 
         savedX = player.getX();
         savedY = player.getY();
@@ -137,6 +158,10 @@ public final class FreecamTweak implements ClientTweak {
         player.onUpdateAbilities();
 
         camera = new FreecamEntity(mc.level, savedX, savedY + player.getEyeHeight(), savedZ);
+        camera.setYRot(yaw);
+        camera.setXRot(pitch);
+        camera.yRotO = yaw;
+        camera.xRotO = pitch;
 
         mc.setCameraEntity(camera);
         mc.options.setCameraType(CameraType.FIRST_PERSON);
@@ -149,15 +174,16 @@ public final class FreecamTweak implements ClientTweak {
 
         player.getAbilities().mayfly = prevMayfly;
         player.getAbilities().flying = prevFlying;
-        player.noPhysics = false;
+        player.noPhysics = prevNoPhysics;
         player.onUpdateAbilities();
 
         player.setPos(savedX, savedY, savedZ);
         player.setYRot(savedYRot);
         player.setXRot(savedXRot);
 
-        mc.setCameraEntity(player);
+        mc.setCameraEntity(prevCameraEntity == null ? player : prevCameraEntity);
         camera = null;
+        prevCameraEntity = null;
 
         player.displayClientMessage(Component.translatable(key), true);
     }
