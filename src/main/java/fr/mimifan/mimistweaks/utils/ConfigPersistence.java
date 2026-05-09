@@ -62,6 +62,7 @@ public final class ConfigPersistence {
         obj.addProperty("fishingKeyCode",   TweaksClientSettings.getFishingKeyCode());
         obj.addProperty("autoClickKeyCode", TweaksClientSettings.getAutoClickKeyCode());
         obj.addProperty("autoToolKeyCode",  TweaksClientSettings.getAutoToolKeyCode());
+        obj.addProperty("autoToolSearchInventory",    TweaksClientSettings.isAutoToolSearchInventory());
         obj.addProperty("configKeyCode",    TweaksClientSettings.getConfigKeyCode());
         obj.addProperty("freecamKeyCode",   TweaksClientSettings.getFreecamKeyCode());
         obj.addProperty("zoomKeyCode",      TweaksClientSettings.getZoomKeyCode());
@@ -112,8 +113,7 @@ public final class ConfigPersistence {
             if (obj.has("autoClickRightClick"))          TweaksClientSettings.setAutoClickRightClick(obj.get("autoClickRightClick").getAsBoolean());
             if (obj.has("autoClickStopOnOpenedScreen")) TweaksClientSettings.setAutoClickStopOnOpenedScreen(obj.get("autoClickStopOnOpenedScreen").getAsBoolean());
             if (obj.has("autoClickAllowWhenUnfocused")) TweaksClientSettings.setAutoClickAllowWhenUnfocused(obj.get("autoClickAllowWhenUnfocused").getAsBoolean());
-            if (obj.has("autoToolStopOnOpenedScreen"))  TweaksClientSettings.setAutoToolStopOnOpenedScreen(obj.get("autoToolStopOnOpenedScreen").getAsBoolean());
-            if (obj.has("autoToolAllowWhenUnfocused"))  TweaksClientSettings.setAutoToolAllowWhenUnfocused(obj.get("autoToolAllowWhenUnfocused").getAsBoolean());
+            if (obj.has("autoToolSearchInventory"))      TweaksClientSettings.setAutoToolSearchInventory(obj.get("autoToolSearchInventory").getAsBoolean());
             if (obj.has("freecamStopOnOpenedScreen"))   TweaksClientSettings.setFreecamStopOnOpenedScreen(obj.get("freecamStopOnOpenedScreen").getAsBoolean());
             if (obj.has("freecamAllowWhenUnfocused"))   TweaksClientSettings.setFreecamAllowWhenUnfocused(obj.get("freecamAllowWhenUnfocused").getAsBoolean());
             if (obj.has("zoomPercent"))                 TweaksClientSettings.setZoomPercent(obj.get("zoomPercent").getAsInt());

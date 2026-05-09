@@ -29,8 +29,7 @@ public final class TweaksClientSettings {
     private static boolean fishingAllowWhenUnfocused = true;
     private static boolean autoClickStopOnOpenedScreen = false;
     private static boolean autoClickAllowWhenUnfocused = true;
-    private static boolean autoToolStopOnOpenedScreen = false;
-    private static boolean autoToolAllowWhenUnfocused = true;
+    private static boolean autoToolSearchInventory = false;
     private static boolean freecamStopOnOpenedScreen = false;
     private static boolean freecamAllowWhenUnfocused = true;
     private static boolean zoomStopOnOpenedScreen = false;
@@ -214,20 +213,13 @@ public final class TweaksClientSettings {
         autoClickAllowWhenUnfocused = value;
     }
 
-    public static boolean isAutoToolStopOnOpenedScreen() {
-        return autoToolStopOnOpenedScreen;
+
+    public static boolean isAutoToolSearchInventory() {
+        return autoToolSearchInventory;
     }
 
-    public static void setAutoToolStopOnOpenedScreen(boolean value) {
-        autoToolStopOnOpenedScreen = value;
-    }
-
-    public static boolean isAutoToolAllowWhenUnfocused() {
-        return autoToolAllowWhenUnfocused;
-    }
-
-    public static void setAutoToolAllowWhenUnfocused(boolean value) {
-        autoToolAllowWhenUnfocused = value;
+    public static void setAutoToolSearchInventory(boolean value) {
+        autoToolSearchInventory = value;
     }
 
     public static boolean isFreecamStopOnOpenedScreen() {

@@ -9,6 +9,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class AutoToolTweak implements ClientTweak {
@@ -61,61 +62,58 @@ public final class AutoToolTweak implements ClientTweak {
         }
 
         BlockState blockState = mc.level.getBlockState(blockHit.getBlockPos());
-        ItemStack bestTool = findBestTool(player, blockState);
 
-        if (bestTool.isEmpty()) {
+        // 1. Search hotbar first
+        int hotbarSlot = findBestToolSlot(player.getInventory(), blockState, 0, 9);
+        if (hotbarSlot >= 0) {
+            if (player.getInventory().selected != hotbarSlot) {
+                player.getInventory().selected = hotbarSlot;
+            }
             return;
         }
 
-        int slotIndex = findHotbarSlotWithItem(player.getInventory(), bestTool);
-        if (slotIndex < 0 || player.getInventory().selected == slotIndex) {
+        // 2. If allowed, search main inventory (slots 9–35)
+        if (!TweaksClientSettings.isAutoToolSearchInventory()) {
             return;
         }
-        player.getInventory().selected = slotIndex;
+
+        int mainSlot = findBestToolSlot(player.getInventory(), blockState, 9, 36);
+        if (mainSlot < 0) {
+            return;
+        }
+
+        // Move the item from the main inventory to the currently held slot by swapping
+        // (equivalent to pressing a number key while hovering a slot in the inventory screen).
+        // Container slot for inventory slots 9-35 equals the inventory slot index directly.
+        mc.gameMode.handleInventoryMouseClick(
+                player.containerMenu.containerId,
+                mainSlot,
+                player.getInventory().selected,
+                ClickType.SWAP,
+                player
+        );
     }
 
     /**
-     * Finds the best tool for breaking the given block state.
-     * Returns an ItemStack representing the best tool, or an empty ItemStack if no suitable tool is found.
+     * Finds the slot index of the best tool for the given block state within [fromSlot, toSlot).
+     * Returns -1 if no suitable tool is found.
      */
-    private ItemStack findBestTool(LocalPlayer player, BlockState blockState) {
-        Inventory inventory = player.getInventory();
-        ItemStack bestTool = ItemStack.EMPTY;
+    private int findBestToolSlot(Inventory inventory, BlockState blockState, int fromSlot, int toSlot) {
+        int bestSlot = -1;
         float bestSpeed = 1.0F;
 
-        // Auto-select from hotbar only so the switch stays instant and side-effect free.
-        for (int i = 0; i < 9; i++) {
+        for (int i = fromSlot; i < toSlot; i++) {
             ItemStack itemStack = inventory.getItem(i);
-            if (itemStack.isEmpty()) {
-                continue;
-            }
-
+            if (itemStack.isEmpty()) continue;
             float mineSpeed = itemStack.getDestroySpeed(blockState);
-            // Prefer tools that are actually effective for the targeted block.
-            if (!itemStack.isCorrectToolForDrops(blockState) && mineSpeed <= 1.0F) {
-                continue;
-            }
+            if (!itemStack.isCorrectToolForDrops(blockState) && mineSpeed <= 1.0F) continue;
             if (mineSpeed > bestSpeed) {
                 bestSpeed = mineSpeed;
-                bestTool = itemStack;
+                bestSlot = i;
             }
         }
 
-        return bestTool;
-    }
-
-    /**
-     * Finds the slot index of an item in the inventory.
-     * Returns -1 if not found.
-     */
-    private int findHotbarSlotWithItem(Inventory inventory, ItemStack targetItem) {
-        for (int i = 0; i < 9; i++) {
-            ItemStack item = inventory.getItem(i);
-            if (ItemStack.isSameItemSameTags(item, targetItem)) {
-                return i;
-            }
-        }
-        return -1;
+        return bestSlot;
     }
 }
 

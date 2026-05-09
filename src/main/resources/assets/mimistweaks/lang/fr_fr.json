@@ -76,8 +76,7 @@
   "screen.mimistweaks.autoclick.stop_on_screens": "Stop si GUI ouvert",
   "screen.mimistweaks.autoclick.allow_unfocused": "Continuer sans le focus",
 
-  "screen.mimistweaks.autotool.stop_on_screens": "Stop si GUI ouvert",
-  "screen.mimistweaks.autotool.allow_unfocused": "Continuer sans le focus",
+  "screen.mimistweaks.autotool.search_inventory": "Chercher dans tout l'inventaire",
 
   "screen.mimistweaks.freecam.stop_on_screens": "Stop si GUI ouvert",
   "screen.mimistweaks.freecam.allow_unfocused": "Continuer sans le focus",

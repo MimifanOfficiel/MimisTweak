@@ -138,6 +138,8 @@ public class TweaksConfigScreen extends Screen {
     private boolean pendingAutoClickStopOnOpenedScreen = TweaksClientSettings.isAutoClickStopOnOpenedScreen();
     private boolean pendingAutoClickAllowWhenUnfocused = TweaksClientSettings.isAutoClickAllowWhenUnfocused();
 
+    private boolean pendingAutoToolSearchInventory = TweaksClientSettings.isAutoToolSearchInventory();
+
     private boolean pendingFreecamStopOnOpenedScreen = TweaksClientSettings.isFreecamStopOnOpenedScreen();
     private boolean pendingFreecamAllowWhenUnfocused = TweaksClientSettings.isFreecamAllowWhenUnfocused();
 
@@ -244,6 +246,12 @@ public class TweaksConfigScreen extends Screen {
 
             TweakEntry autoTool = new TweakEntry(TweaksClient.Tweak.AUTO_TOOL, "screen.mimistweaks.tweak.autotool");
             autoTool.expanded = TweaksClientSettings.getTweakExpanded(TweaksClient.Tweak.AUTO_TOOL);
+            autoTool.widgets.add(addRenderableWidget(CycleButton.onOffBuilder(pendingAutoToolSearchInventory)
+                    .create(0, 0, 200, WIDGET_HEIGHT, Component.translatable("screen.mimistweaks.autotool.search_inventory"),
+                            (button, value) -> {
+                                pendingAutoToolSearchInventory = value;
+                                applyPendingValues();
+                            })));
             panel.tweaks.add(autoTool);
         } else if (category == Category.MISC) {
             TweakEntry freecam = new TweakEntry(TweaksClient.Tweak.FREECAM, "screen.mimistweaks.tweak.freecam");
@@ -414,6 +422,8 @@ public class TweaksConfigScreen extends Screen {
         TweaksClientSettings.setAutoClickRightClick(pendingAutoClickRightClick);
         TweaksClientSettings.setAutoClickStopOnOpenedScreen(pendingAutoClickStopOnOpenedScreen);
         TweaksClientSettings.setAutoClickAllowWhenUnfocused(pendingAutoClickAllowWhenUnfocused);
+
+        TweaksClientSettings.setAutoToolSearchInventory(pendingAutoToolSearchInventory);
 
         TweaksClientSettings.setFreecamStopOnOpenedScreen(pendingFreecamStopOnOpenedScreen);
         TweaksClientSettings.setFreecamAllowWhenUnfocused(pendingFreecamAllowWhenUnfocused);

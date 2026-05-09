@@ -76,8 +76,7 @@
   "screen.mimistweaks.autoclick.stop_on_screens": "Stop on opened screens",
   "screen.mimistweaks.autoclick.allow_unfocused": "Allow when unfocused",
 
-  "screen.mimistweaks.autotool.stop_on_screens": "Stop on opened screens",
-  "screen.mimistweaks.autotool.allow_unfocused": "Allow when unfocused",
+  "screen.mimistweaks.autotool.search_inventory": "Search full inventory",
 
   "screen.mimistweaks.freecam.stop_on_screens": "Stop on opened screens",
   "screen.mimistweaks.freecam.allow_unfocused": "Allow when unfocused",
